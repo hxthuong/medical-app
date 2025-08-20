@@ -1,45 +1,23 @@
-import {
-  addRegistration,
-  updateRegistration,
-} from "@/services/api.registration";
 import { getUserData } from "@/services/api.user";
+import { IModalProps } from "@/types/props";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { format } from "date-fns";
 import { useEffect, useState } from "react";
-import { Alert, Button, Modal, StyleSheet, Text, View } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
-import { RadioButton } from "react-native-paper";
+import { Modal, StyleSheet, Text, View } from "react-native";
 
-interface IEditProps {
-  title: string;
-  modalVisible: boolean;
-  setModalVisible: (v: boolean) => void;
-  data: any;
-  editFunc: any;
-}
-
-const DetailRecordModal = (props: IEditProps) => {
-  const { title, modalVisible, setModalVisible, data, editFunc } = props;
-  const [name, setName] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState(
-    format(new Date(), "dd/MM/yyyy")
-  );
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [department, setDepartment] = useState("");
-  const [roomNo, setRoomNo] = useState("");
-  const [gender, setGender] = useState("male");
+const EditServiceDetailModal = (props: IModalProps) => {
+  const { title, modalVisible, setModalVisible, data, callbackFunc } = props;
+  const [service, setService] = useState(null);
   const [user, setUser] = useState<any>(null);
 
-  useEffect(() => {
-    setName(data?.Name || "");
-    setDateOfBirth(format(data?.DateOfBirth || new Date(), "dd/MM/yyyy"));
-    setPhone(data?.Phone || "");
-    setAddress(data?.Address || "");
-    setDepartment(data?.Department || "");
-    setRoomNo(data?.RoomNo || "");
-    setGender(data?.Gender === false ? "female" : "male");
-  }, [data]);
+  // useEffect(() => {
+  //   setName(data?.Name || "");
+  //   setDateOfBirth(format(data?.DateOfBirth || new Date(), "dd/MM/yyyy"));
+  //   setPhone(data?.Phone || "");
+  //   setAddress(data?.Address || "");
+  //   setDepartment(data?.Department || "");
+  //   setRoomNo(data?.RoomNo || "");
+  //   setGender(data?.Gender === false ? "female" : "male");
+  // }, [data]);
 
   useEffect(() => {
     (async () => {
@@ -49,85 +27,85 @@ const DetailRecordModal = (props: IEditProps) => {
     })();
   });
 
-  const resetData = () => {
-    setName("");
-    setDateOfBirth(format(new Date(), "dd/MM/yyyy"));
-    setPhone("");
-    setAddress("");
-    setDepartment("");
-    setRoomNo("");
-    setGender("male");
-    setUser(null);
-  };
+  // const resetData = () => {
+  //   setName("");
+  //   setDateOfBirth(format(new Date(), "dd/MM/yyyy"));
+  //   setPhone("");
+  //   setAddress("");
+  //   setDepartment("");
+  //   setRoomNo("");
+  //   setGender("male");
+  //   setUser(null);
+  // };
 
-  const handleAdd = async () => {
-    try {
-      const date = dateOfBirth.split("/").reverse().join("-") || "";
-      const query = {
-        Name: name || "",
-        DateOfBirth: date || "",
-        Gender: gender === "male" ? true : false,
-        Address: address || "",
-        Phone: phone || "",
-        Department: department || "",
-        RoomNo: roomNo || "",
-        CreatedByUser: user?.ID || null,
-      };
+  // const handleAdd = async () => {
+  //   try {
+  //     const date = dateOfBirth.split("/").reverse().join("-") || "";
+  //     const query = {
+  //       Name: name || "",
+  //       DateOfBirth: date || "",
+  //       Gender: gender === "male" ? true : false,
+  //       Address: address || "",
+  //       Phone: phone || "",
+  //       Department: department || "",
+  //       RoomNo: roomNo || "",
+  //       CreatedByUser: user?.ID || null,
+  //     };
 
-      const addItem = await addRegistration({ query: query });
+  //     const addItem = await addRegistration({ query: query });
 
-      if (addItem) {
-        Alert.alert(
-          "Thông báo",
-          `Thêm mới thông tin bệnh nhân ${name} thành công!`,
-          [{ text: "OK" }],
-          {
-            cancelable: true,
-          }
-        );
+  //     if (addItem) {
+  //       Alert.alert(
+  //         "Thông báo",
+  //         `Thêm mới thông tin bệnh nhân ${name} thành công!`,
+  //         [{ text: "OK" }],
+  //         {
+  //           cancelable: true,
+  //         }
+  //       );
 
-        resetData();
-        setModalVisible(false);
-        editFunc();
-      }
-    } catch (error) {
-      console.log("Thêm mới thông tin thất bại, lỗi: " + error);
-    }
-  };
+  //       resetData();
+  //       setModalVisible(false);
+  //       callbackFunc();
+  //     }
+  //   } catch (error) {
+  //     console.log("Thêm mới thông tin thất bại, lỗi: " + error);
+  //   }
+  // };
 
-  const handleEdit = async () => {
-    try {
-      const date = new Date(dateOfBirth.split("/").reverse().join("-")) || "";
+  // const handleEdit = async () => {
+  //   try {
+  //     const date = new Date(dateOfBirth.split("/").reverse().join("-")) || "";
 
-      const query = {
-        ID: data?.ID,
-        Name: name || "",
-        DateOfBirth: date || "",
-        Gender: gender === "male" ? true : false,
-        Address: address || "",
-        Phone: phone || "",
-        Department: department || "",
-        RoomNo: roomNo || "",
-        ModifiedByUser: user?.ID || null,
-      };
+  //     const query = {
+  //       ID: data?.ID,
+  //       Name: name || "",
+  //       DateOfBirth: date || "",
+  //       Gender: gender === "male" ? true : false,
+  //       Address: address || "",
+  //       Phone: phone || "",
+  //       Department: department || "",
+  //       RoomNo: roomNo || "",
+  //       ModifiedByUser: user?.ID || null,
+  //     };
 
-      const editItem = await updateRegistration({ query: query });
+  //     const editItem = await updateRegistration({ query: query });
 
-      Alert.alert(
-        "Thông báo",
-        `Cập nhật thông tin bệnh nhân ${name} thành công!`,
-        [{ text: "OK" }],
-        {
-          cancelable: true,
-        }
-      );
-      resetData();
-      setModalVisible(false);
-      editFunc();
-    } catch (error) {
-      console.log("Cập nhật thông tin thất bại, lỗi: " + error);
-    }
-  };
+  //     Alert.alert(
+  //       "Thông báo",
+  //       `Cập nhật thông tin bệnh nhân ${name} thành công!`,
+  //       [{ text: "OK" }],
+  //       {
+  //         cancelable: true,
+  //       }
+  //     );
+  //     resetData();
+  //     setModalVisible(false);
+  //     callbackFunc();
+  //   } catch (error) {
+  //     console.log("Cập nhật thông tin thất bại, lỗi: " + error);
+  //   }
+  // };
 
   return (
     <Modal animationType="slide" transparent={true} visible={modalVisible}>
@@ -145,7 +123,7 @@ const DetailRecordModal = (props: IEditProps) => {
           />
         </View>
         {/* body */}
-        <View>
+        {/* <View>
           <View style={styles.groupInput}>
             <Text style={styles.label}>Tên bệnh nhân</Text>
             <TextInput
@@ -218,14 +196,14 @@ const DetailRecordModal = (props: IEditProps) => {
               </View>
             </View>
           </RadioButton.Group>
-        </View>
+        </View> */}
         {/* footer */}
-        <View style={{ marginTop: 5 }}>
+        {/* <View style={{ marginTop: 5 }}>
           <Button
             title={data ? "Lưu chỉnh sửa" : "Thêm mới"}
             onPress={data ? handleEdit : handleAdd}
           />
-        </View>
+        </View> */}
       </View>
     </Modal>
   );
@@ -265,4 +243,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DetailRecordModal;
+export default EditServiceDetailModal;

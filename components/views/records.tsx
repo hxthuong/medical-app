@@ -144,15 +144,15 @@ export default function RecordsScreen() {
           modalVisible={openModal}
           setModalVisible={setOpenModal}
           data={rowData}
-          editFunc={loadRegistrations}
+          callbackFunc={loadRegistrations}
         />
         {/* modal delete */}
         <DeleteModal
-          title="thông tin bệnh nhân"
+          title={rowData?.Name}
           data={rowData}
           modalVisible={openModalDelete}
           setModalVisible={setOpenModalDelete}
-          deleteFunc={handleDelete}
+          callbackFunc={handleDelete}
         />
       </View>
     </>

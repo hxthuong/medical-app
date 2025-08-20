@@ -1,15 +1,23 @@
 import { fetchRegistration } from "@/services/api.registration";
 import useFetch from "@/services/useFetch";
-import { AntDesign, Entypo, FontAwesome, Fontisto } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Entypo,
+  FontAwesome,
+  FontAwesome5,
+  Fontisto,
+} from "@expo/vector-icons";
 import { format } from "date-fns";
 import { useState } from "react";
 import {
-  Dimensions,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import Carousel from "react-native-reanimated-carousel";
+import DeleteModal from "./modals/delete.modal";
 
 const services = [
   {
@@ -41,12 +49,15 @@ const services = [
   },
 ];
 
-const ServiceItem = ({ item, isLast }: any) => {
+const ServiceItem = ({ item, editFunc, deleteFunc }: any) => {
   return (
-    <View style={[styles.serviceItem, { borderBottomWidth: isLast ? 0 : 1 }]}>
+    <View style={styles.serviceItem}>
       {/* content */}
       <View>
-        <Text style={styles.serviceTitle}>{item.ServiceName}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <FontAwesome5 name="notes-medical" size={30} color="#3b71ca" />
+          <Text style={styles.serviceTitle}>{item.ServiceName}</Text>
+        </View>
         <View style={styles.serviceGroup}>
           <Text>Số lần: {item.UsageCount}</Text>
           <Text>Đơn giá: {item.Price.toLocaleString("de-DE")} VNĐ</Text>
@@ -78,7 +89,7 @@ const ServiceItem = ({ item, isLast }: any) => {
           name="edit"
           size={24}
           color="#e4a11b"
-          // onPress={() => handleOpenModal(row)}
+          onPress={editFunc}
         />
 
         <FontAwesome
@@ -86,7 +97,7 @@ const ServiceItem = ({ item, isLast }: any) => {
           name="trash"
           size={24}
           color="#fe2c55"
-          // onPress={() => handleOpenModalDelete(row)}
+          onPress={deleteFunc}
         />
       </View>
     </View>
@@ -97,10 +108,22 @@ export default function RecordDetailScreen({ route }: any) {
   const { id } = route.params;
   const [collapsedInfo, setCollapsedInfo] = useState(false);
   const [collapsedService, setCollapsedService] = useState(false);
-
-  const screenWidth = Dimensions.get("window").width;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [openModal, setOpenModal] = useState(false);
+  const [openModalDelete, setOpenModalDelete] = useState(false);
+  const [serviceData, setServiceData] = useState<any>(null);
 
   const { data } = useFetch(() => fetchRegistration({ query: { ID: id } }));
+
+  const handleOpenModal = (item: any) => {
+    setServiceData(item);
+    setOpenModal(true);
+  };
+
+  const handleOpenModalDelete = (item: any) => {
+    setServiceData(item);
+    setOpenModalDelete(true);
+  };
 
   return (
     <View style={styles.container}>
@@ -147,36 +170,55 @@ export default function RecordDetailScreen({ route }: any) {
         >
           <Text style={styles.headerTitle}>Danh sách dịch vụ</Text>
         </TouchableOpacity>
-        {/* {!collapsedService && (
-          <Carousel
-            loop
-            width={screenWidth}
-            height={collapsedInfo ? 496 : 312}
-            data={services}
-            renderItem={({ item, index }) => (
-              <ServiceItem
-                key={item.ID}
-                item={item}
-                isLast={index === services.length - 1}
-              />
-            )}
-          />
-          
-          
-        )} */}
-        {/* // <View style={[styles.content, { height: collapsedInfo ? 496 : 312 }]}>
-          //   <FlatList
-          //     data={services}
-          //     keyExtractor={(item) => `${item.ID}`}
-          //     renderItem={({ item, index }) => (
-          //       <ServiceItem
-          //         key={item.ID}
-          //         item={item}
-          //         isLast={index === services.length - 1}
-          //       />
-          //     )}
-          //   />
-          // </View> */}
+
+        {!collapsedService && (
+          <View style={[styles.content]}>
+            <Carousel
+              loop
+              width={300}
+              height={180}
+              snapEnabled={true}
+              pagingEnabled={true}
+              data={services}
+              onSnapToItem={(index) => setCurrentIndex(index)}
+              renderItem={({ item, index }) => (
+                <ServiceItem
+                  key={item.ID}
+                  item={item}
+                  editFunc={() => handleOpenModal(item)}
+                  deleteFunc={() => handleOpenModalDelete(item)}
+                />
+              )}
+            />
+            {/* Dots indicator */}
+            <View style={styles.dotsContainer}>
+              {services.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.dot,
+                    currentIndex === index && styles.activeDot,
+                  ]}
+                />
+              ))}
+            </View>
+          </View>
+        )}
+      </View>
+
+      <Pressable style={styles.btnAdd} onPress={() => handleOpenModal(null)}>
+        <AntDesign name="plus" size={24} color="white" />
+      </Pressable>
+
+      {/* modal */}
+      <View style={{ flex: 1 }}>
+        <DeleteModal
+          title={serviceData?.ServiceName}
+          data={serviceData}
+          modalVisible={openModalDelete}
+          setModalVisible={setOpenModalDelete}
+          deleteFunc={() => alert(1)}
+        />
       </View>
     </View>
   );
@@ -235,6 +277,7 @@ const styles = StyleSheet.create({
   serviceTitle: {
     fontSize: 16,
     fontWeight: 600,
+    marginLeft: 10,
   },
   serviceGroup: {
     flexDirection: "row",
@@ -247,5 +290,33 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
+  },
+  dotsContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 4,
+    backgroundColor: "#b3d7ff",
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: "#3b71ca",
+  },
+  btnAdd: {
+    position: "absolute", // <- dùng absolute thay cho fixed
+    right: 20,
+    bottom: 90,
+    backgroundColor: "#007AFF",
+    borderRadius: 30,
+    padding: 10,
+    elevation: 5, // Android shadow
+    shadowColor: "#000", // iOS shadow
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
   },
 });

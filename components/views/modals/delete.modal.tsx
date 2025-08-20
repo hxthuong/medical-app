@@ -1,16 +1,9 @@
+import { IModalProps } from "@/types/props";
 import { FontAwesome } from "@expo/vector-icons";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
-interface IDeleteProps {
-  title: string;
-  modalVisible: boolean;
-  setModalVisible: (v: boolean) => void;
-  data: any;
-  deleteFunc: any;
-}
-
-const DeleteModal = (props: IDeleteProps) => {
-  const { title, modalVisible, setModalVisible, data, deleteFunc } = props;
+const DeleteModal = (props: IModalProps) => {
+  const { title, modalVisible, setModalVisible, data, callbackFunc } = props;
 
   return (
     <Modal animationType="slide" transparent={true} visible={modalVisible}>
@@ -19,8 +12,8 @@ const DeleteModal = (props: IDeleteProps) => {
           <View style={styles.content}>
             <FontAwesome name="trash" size={50} color="red" />
             <Text style={styles.text}>
-              Bạn xác nhận muốn xóa {title}{" "}
-              <Text style={{ color: "red" }}>{data?.Name}</Text> {"?"}
+              Bạn xác nhận muốn xóa{" "}
+              <Text style={{ color: "red" }}>{title}</Text> {"?"}
             </Text>
           </View>
           <View style={styles.groupBtn}>
@@ -49,7 +42,7 @@ const DeleteModal = (props: IDeleteProps) => {
                 styles.btn,
                 pressed ? styles.btnDeleteHover : styles.btnDelete,
               ]}
-              onPress={deleteFunc}
+              onPress={callbackFunc}
             >
               {({ pressed }) => (
                 <Text

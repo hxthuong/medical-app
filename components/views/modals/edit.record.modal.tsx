@@ -3,6 +3,7 @@ import {
   updateRegistration,
 } from "@/services/api.registration";
 import { getUserData } from "@/services/api.user";
+import { IModalProps } from "@/types/props";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
@@ -10,16 +11,8 @@ import { Alert, Button, Modal, StyleSheet, Text, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { RadioButton } from "react-native-paper";
 
-interface IEditProps {
-  title: string;
-  modalVisible: boolean;
-  setModalVisible: (v: boolean) => void;
-  data: any;
-  editFunc: any;
-}
-
-const EditRecordModal = (props: IEditProps) => {
-  const { title, modalVisible, setModalVisible, data, editFunc } = props;
+const EditRecordModal = (props: IModalProps) => {
+  const { title, modalVisible, setModalVisible, data, callbackFunc } = props;
   const [name, setName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState(
     format(new Date(), "dd/MM/yyyy")
@@ -88,7 +81,7 @@ const EditRecordModal = (props: IEditProps) => {
 
         resetData();
         setModalVisible(false);
-        editFunc();
+        callbackFunc();
       }
     } catch (error) {
       console.log("Thêm mới thông tin thất bại, lỗi: " + error);
@@ -123,7 +116,7 @@ const EditRecordModal = (props: IEditProps) => {
       );
       resetData();
       setModalVisible(false);
-      editFunc();
+      callbackFunc();
     } catch (error) {
       console.log("Cập nhật thông tin thất bại, lỗi: " + error);
     }
